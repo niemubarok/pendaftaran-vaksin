@@ -2,7 +2,8 @@ import { reactive, readonly } from 'vue'
 
 const defaultState = {
     isDateFilled: false,
-    isTimeChoosed:false
+    isTimeChoosed: false,
+    showDialog:true
 }
 
 const state = reactive(defaultState)

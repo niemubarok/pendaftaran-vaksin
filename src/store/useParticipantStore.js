@@ -13,7 +13,24 @@ const data = {
   },
   registrationDetail: {
     date: "",
-    time: "",
+    dateForDB:"",
+    session:"",
+    time: () => {
+      const selectedSession = data.registrationDetail.session
+      switch (selectedSession) {
+        case "sessionOne":
+          return "08.00-10.00"
+          break
+        case "sessionTwo":
+          return "10.00-12.00"
+          break
+        case "sessionThree":
+          return "13.00-12.00"
+          break
+        default:
+          return ""
+      }
+    },
     quota: {
       sessionOne: 0,
       sessionTwo: 0,
@@ -34,13 +51,14 @@ const actions = {
   setDate: (date) => {
     state.registrationDetail.date = date;
   },
+  setDateForDB: (date) => {
+    state.registrationDetail.dateForDB = date
+  },
   setTime: (time) => {
     state.registrationDetail.time = time;
   },
   addQuota: () => {
-    const dateForDB = state.registrationDetail.date;
-    console.log(state.registrationDetail.date);
-    const docRef = db.collection("quota").doc(dateForDB);
+    const docRef = db.collection("quota").doc(state.registrationDetail.dateForDB);
     docRef
       .get()
       .then((doc) => {
@@ -57,13 +75,13 @@ const actions = {
           let sessionOneQuota = doc.data().sessionOne;
           let sessionTwoQuota = doc.data().sessionTwo;
           let sessionThreeQuota = doc.data().sessionThree;
-          if (state.registrationDetail.time == "sessionOne") {
+          if (state.registrationDetail.session == "sessionOne") {
             docRef.update({
               sessionOne: sessionOneQuota + 1,
               sessionTwo: sessionTwoQuota,
               sessionThree: sessionThreeQuota,
             });
-          } else if (state.registrationDetail.time == "sessionTwo") {
+          } else if (state.registrationDetail.session == "sessionTwo") {
             docRef.update({
               sessionOne: sessionOneQuota,
               sessionTwo: sessionTwoQuota + 1,
@@ -110,7 +128,7 @@ const actions = {
   },
   uploadDataToFirestore: () => {
     const date = state.registrationDetail.date;
-    let time = state.registrationDetail.time;
+    let time = state.registrationDetail.time();
     db.collection("participants")
       .doc(date)
       .set(

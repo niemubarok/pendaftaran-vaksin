@@ -51,6 +51,7 @@ export default {
       state: participant,
       isDateFilled,
       setDate,
+      setDateForDB,
       setTime,
       reduceQuota,
       getSessionQuota,
@@ -77,24 +78,21 @@ export default {
 
     const save = () => {
       okButtonClicked.value = true;
-      setDate(date.formatDate(proxyDate.value, "DD-MM-YYYY"));
-      // getCurrentQuota("Jum'at, 16-07-2021").then(quota=>{
-      // console.log(quota.sessionOne);
-      // });
+      setDate(date.formatDate(proxyDate.value, "dddd, DD-MM-YYYY"));
+      setDateForDB(date.formatDate(proxyDate.value, "DD-MM-YYYY"))
     };
     const cancel = () => {
       if (okButtonClicked.value == false) {
         setDate("");
         setTime("");
+        participant.registrationDetail.session = ""
         reduceQuota();
       }
       okButtonClicked.value = false;
     };
 
-    onMounted(() => {
-      console.log(availableDate)
-    
-    });
+    // onMounted(() => {
+    // });
 
     return {
       isDateFilled,

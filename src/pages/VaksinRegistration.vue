@@ -2,13 +2,19 @@
   <!-- {{ participant.registrationDetail.quota }} -->
   <img v-if="$q.screen.lt.md" src="~assets/header.png" class="full-width" />
 
+<q-card v-if="$q.screen.gt.sm" class="q-ma-md roundedCard bg-primary">
+  <q-card-section>
+  <q-chip color="secondary" text-color="grey-1">RS Ali Sibroh Malisi</q-chip>
+  <h4 class="text-grey-9">Formulir Pendaftaran Vaksin Covid-19</h4>
+  </q-card-section>
+</q-card>
   <!-- <q-form @submit="onSubmit"> -->
-  <div :style="$q.screen.lt.md ? 'margin-top:-135px' : ''">
-    <q-card class="q-mx-sm q-pb-sm roundedCard transparentCard">
+  <div :style="$q.screen.lt.md ? 'margin-top:-40%' : ''">
+    <q-card class="q-mx-sm q-pb-sm roundedCard">
       <div>
         <q-chip color="primary" class="q-mb-sm"> Tanggal Vaksin </q-chip>
       </div>
-      <choose-date class="q-ml-sm z-top" />
+      <choose-date class="q-ml-sm" />
     </q-card>
     <!-- JAM KEDATANGAN -->
     <skeleton
@@ -20,14 +26,14 @@
     <q-card v-if="isDateFilled()" class="q-ma-sm roundedCard">
       <div>
         <q-chip color="primary" text-color="dark">
-          Ingin datang jam berapa?
+          Sesi Kedatangan
         </q-chip>
       </div>
       <q-card-section>
         <div class="row">
           <q-radio
             :disable="participant.registrationDetail.quota.sessionOne >= 1"
-            v-model="participant.registrationDetail.time"
+            v-model="participant.registrationDetail.session"
             val="sessionOne"
             color="green"
             label="08.00-10.00"
@@ -35,13 +41,13 @@
             <q-tooltip> kuota full </q-tooltip>
           </q-radio>
           <q-radio
-            v-model="participant.registrationDetail.time"
+            v-model="participant.registrationDetail.session"
             val="sessionTwo"
             color="orange"
             label="10.00-12.00"
           />
           <q-radio
-            v-model="participant.registrationDetail.time"
+            v-model="participant.registrationDetail.session"
             val="sessionThree"
             color="orange-10"
             label="13.00-15.00"
@@ -52,13 +58,13 @@
 
     <!-- NIK -->
     <skeleton
-      v-if="participant.registrationDetail.time == ''"
+      v-if="participant.registrationDetail.session == ''"
       headerType="QChip"
       bodyType="rect"
       message="Nomor Induk Kependudukan"
     />
     <q-card
-      v-if="participant.registrationDetail.time !== ''"
+      v-if="participant.registrationDetail.session !== ''"
       class="q-ma-sm roundedCard"
     >
       <div>
@@ -139,11 +145,8 @@
     </q-card>
 
     <q-card-section>
-      <q-checkbox
-        size="xs"
-        label="Saya menyatakan data yang saya masukan sudah benar"
-      />
       <q-btn
+      rounded
         @click="onSubmit"
         type="submit"
         class="full-width"
@@ -152,6 +155,7 @@
       >
     </q-card-section>
   </div>
+  <dialog-confirmation />
   <!-- </q-form> -->
 </template>
 
@@ -164,9 +168,10 @@ import useComponentStore from "src/store/useComponentStore";
 import useParticipantStore from "src/store/useParticipantStore";
 import Skeleton from "src/components/Skeleton.vue";
 import useQuotaStore from "src/store/useQuotaStore";
+import dialogConfirmation from "src/components/dialogConfirmation.vue";
 
 export default {
-  components: { ChooseDate, Stepper, Skeleton },
+  components: { ChooseDate, Stepper, Skeleton, dialogConfirmation },
   setup() {
     const $q = useQuasar();
     const { state } = useComponentStore();
@@ -187,12 +192,11 @@ export default {
           color: "red",
         });
       }
-
-      if (participant.registrationDetail.date !== "") {
-        uploadDataToFirestore();
-        
-        // console.log(participant.registrationDetail.quota);
-      }
+      state.showDialog = true;
+      uploadDataToFirestore();
+      addQuota();
+      // if (participant.registrationDetail.date !== "") {
+      // }
     };
 
     onMounted(() => {
