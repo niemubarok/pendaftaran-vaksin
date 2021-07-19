@@ -1,4 +1,4 @@
-import { reactive } from "vue";
+import { reactive,ref } from "vue";
 import { db } from "src/boot/firebase";
 import { date } from "quasar";
 
@@ -10,7 +10,7 @@ const defaultState = {
     sessionThree: 0,
     maxQuota: 0,
   },
-  availableDate:[]
+  availableDate: []
 };
 
 const state = reactive(defaultState);
@@ -30,7 +30,7 @@ const actions = {
     //Ambil tanggal untuk satu minggu kedepan
     const today = new Date();
     let oneWeekDate = [];
-    for (let i = 0; i < 7; i++) {
+    for (let i = 0; i < 14; i++) {
       oneWeekDate.push(
         date.formatDate(
           new Date(today.getFullYear(), today.getMonth(), today.getDate() + i),
@@ -62,35 +62,43 @@ const actions = {
   },
 
   //Mengambil tanggal dalam 1 minggu
-  getAvailableDate: function(){
-    const today = new Date();
-    // const nextWeek = new Date(today.getFullYear(), today.getMonth(), today.getDate()+7);
+  setAvailableDate: function(){
     let oneWeekDate = [];
-    for (let i = 0; i < 7; i++) {
-      oneWeekDate.push(
-        date.formatDate(
-          new Date(today.getFullYear(), today.getMonth(), today.getDate() + i),
-          "YYYY/MM/DD"
-        )
-      );
+    for (let i = 0; i < 14; i++) {
+      const today = new Date();
+      const fullDate = new Date(today.getFullYear(), today.getMonth(), today.getDate()+i)
+      const day = fullDate.getDay()
+
+      if(day !== 0 && day !== 6){
+        const dateFormatted = date.formatDate(fullDate, "YYYY/MM/DD");
+        oneWeekDate.push(dateFormatted)
+      }
     }
 
     oneWeekDate.forEach((eachDate) => {
       const formattedEachDate = date.formatDate(eachDate, "DD-MM-YYYY");
-      // console.log(formattedEachDate);
       actions.getCurrentQuota(formattedEachDate).then((quota) => {
         const totalQuota =
-          quota.sessionOne + quota.sessionTwo + quota.sessionThree;
+        quota.sessionOne + quota.sessionTwo + quota.sessionThree;
         const maxQuotaPerDay = quota.maxQuota;
-        if (totalQuota <= maxQuotaPerDay) {
-          state.availableDate.push(quota.date, availableDate.value.length);
+        if (totalQuota <= maxQuotaPerDay ) {
+          // if(quota.date.getDay())
+          state.availableDate.splice(0, 0, quota.date);
         }
       });
     });
   },
+  
 };
+
+const getters = {
+  getAvailableDate:()=>{
+    return state.availableDate
+  }
+}
 
 export default () => ({
   state,
+  ...getters,
   ...actions,
 });

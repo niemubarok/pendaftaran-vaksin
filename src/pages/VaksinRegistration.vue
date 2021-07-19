@@ -170,17 +170,13 @@ export default {
   setup() {
     const $q = useQuasar();
     const { state } = useComponentStore();
-    const { setQuotaForOneWeek, getAvailableDate } =
+    const { setQuotaForOneWeek, setAvailableDate, getAvailableDate } =
       useQuotaStore();
     const {
       state: participant,
       getDetails,
       isDateFilled,
-      // getDataFromSheet
-      getDataFromFirestore,
       uploadDataToFirestore,
-      getDataLength,
-      getSessionQuota,
       addQuota,
     } = useParticipantStore();
 
@@ -194,8 +190,8 @@ export default {
 
       if (participant.registrationDetail.date !== "") {
         uploadDataToFirestore();
-        addQuota();
-        console.log(participant.registrationDetail.quota);
+        
+        // console.log(participant.registrationDetail.quota);
       }
     };
 
@@ -203,6 +199,7 @@ export default {
       // getCurrentQuota("Jum'at, 16-07-2021").then(quota=>{
       //   console.log(quota.sessionOne);
       // });
+      setAvailableDate();
       getAvailableDate();
       setQuotaForOneWeek();
     });

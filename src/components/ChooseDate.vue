@@ -60,9 +60,7 @@ export default {
     const datePicker = ref(timeStamp);
     const proxyDate = ref(date.formatDate(Date.now(), "dddd, YYYY/MM/DD"));
     const okButtonClicked = ref(false);
-    const availableDate = quota.availableDate;
-
-    
+    const availableDate = getAvailableDate();
 
     const updateProxy = () => {
       proxyDate.value = datePicker.value;
@@ -79,7 +77,7 @@ export default {
 
     const save = () => {
       okButtonClicked.value = true;
-      setDate(date.formatDate(proxyDate.value, "dddd, DD-MM-YYYY"));
+      setDate(date.formatDate(proxyDate.value, "DD-MM-YYYY"));
       // getCurrentQuota("Jum'at, 16-07-2021").then(quota=>{
       // console.log(quota.sessionOne);
       // });
@@ -93,9 +91,10 @@ export default {
       okButtonClicked.value = false;
     };
 
-    // onMounted(() => {
-    //   getAvailableDate();
-    // });
+    onMounted(() => {
+      console.log(availableDate)
+    
+    });
 
     return {
       isDateFilled,
@@ -109,6 +108,7 @@ export default {
       optionFn,
       updateProxy,
       availableDate,
+      
     };
   },
 };

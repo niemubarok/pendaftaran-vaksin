@@ -19,7 +19,7 @@ const data = {
       sessionTwo: 0,
       sessionThree: 0,
     },
-    maxQuota: 3,
+    maxQuota: 150,
   },
 };
 
@@ -39,12 +39,15 @@ const actions = {
   },
   addQuota: () => {
     const dateForDB = state.registrationDetail.date;
+    console.log(state.registrationDetail.date);
     const docRef = db.collection("quota").doc(dateForDB);
     docRef
       .get()
       .then((doc) => {
         if (!doc.exists) {
           docRef.set({
+            date:`${dateForDB}`,
+            maxQuota:state.maxQuota,
             sessionOne: 0,
             sessionTwo: 0,
             sessionThree: 0,
@@ -55,19 +58,19 @@ const actions = {
           let sessionTwoQuota = doc.data().sessionTwo;
           let sessionThreeQuota = doc.data().sessionThree;
           if (state.registrationDetail.time == "sessionOne") {
-            docRef.set({
+            docRef.update({
               sessionOne: sessionOneQuota + 1,
               sessionTwo: sessionTwoQuota,
               sessionThree: sessionThreeQuota,
             });
           } else if (state.registrationDetail.time == "sessionTwo") {
-            docRef.set({
+            docRef.update({
               sessionOne: sessionOneQuota,
               sessionTwo: sessionTwoQuota + 1,
               sessionThree: sessionThreeQuota,
             });
           } else {
-            docRef.set({
+            docRef.update({
               sessionOne: sessionOneQuota,
               sessionTwo: sessionTwoQuota,
               sessionThree: sessionThreeQuota + 1,
@@ -128,33 +131,11 @@ const actions = {
         //     sessionTwo: 0,
         //     sessionThree: 0,
         //   });
+        actions.addQuota()
         console.log("success");
       })
       .catch((error) => {
         console.log(error);
-      });
-  },
-  getDataLength: () => {
-    const date = state.registrationDetail.date.replace("/", "");
-    participants
-      .doc(date)
-      .get()
-      .then((doc) => {
-        console.log(Object.keys(doc.data()).length);
-      });
-  },
-  getSessionQuota: async (selectdate) => {
-    const selectedDate = date.formatDate(selectdate, 'dddd, DD-MM-YYYY')
-    quota
-      .doc(selectedDate)
-      .get()
-      .then((doc) => {
-        console.log(doc.data());
-        if (doc.exists) {
-          state.registrationDetail.quota.sessionOne = doc.data().sessionOne;
-          state.registrationDetail.quota.sessionTwo = doc.data().sessionTwo;
-          state.registrationDetail.quota.sessionThree = doc.data().sessionThree;
-        }
       });
   },
 };
